@@ -1,35 +1,32 @@
-exports.ClozeCard = function(text, cloze) {
-	var textToLower = text.toLowerCase();
-	var clozeToLower = cloze.toLowerCase();
-
-	if (!textToLower.includes(clozeToLower)) {
-		console.log('ERROR: cloze-deletion does not appear within full text -- <' + cloze + '>');
-		return;
-	}
-
+var ClozeCard = function(text, cloze) {
 	this.fullText = text;
 	this.cloze = cloze;
 	this.partial = text.replace(cloze, '...');
+
+	var clozeStart = text.search(cloze);
+		if (clozeStart === -1){ 
+			console.log("ERROR");
+			this.partial = text;
+		}
+		else {
+			var tempText = text.split("");
+			tempText.splice(clozeStart, cloze.length, "?",);
+			this.partial = tempText.join("");
+		}
 }
 
 
-module.exports = [ { front: "Santa Claus delivers presents on Christmas Eve?" , back: "Santa Claus" },
-{front: "25th December is the date of Christmas Day?" , back: "25th December" },
-{front: "Rudolph the reindeer has a red nose." , back: "Rudolph"},
-{front: "Jingle Bells is a famous Christmas Carol with the word Bells in the title." , back: "Jingle Bells" },
-{front: "There were three wise men in Bethlehem?" , back: "three"}
-]
+module.exports = ClozeCard;
+
 
 var firstPresidentCloze = new ClozeCard(
     "George Washington was the first president of the United States.", "George Washington");
 
-// "George Washington"
+
 console.log(firstPresidentCloze.cloze); 
 
-// " ... was the first president of the United States.
 console.log(firstPresidentCloze.partial); 
 
-// "George Washington was the first president of the United States.
 console.log(firstPresidentCloze.fullText): 
 
 
@@ -76,7 +73,22 @@ console.log(companyTwoCloze.fullText):
 // Should throw or log an error because "oops" doesn't appear in "This doesn't work"
 var brokenCloze = new ClozeCard("This doesn't work", "oops");
 
+function promptClozeCard() {
+    inquirer.prompt([{
+        type: 'input',
+        name: 'full_text',
+        message: 'Enter the question: '
+    }, {
+        type: 'input',
+        name: 'cloze',
+        message: 'Enter the term you want as the cloze: '
+    }]).then(function(answer) {
+        let card = new ClozeCard(answer.full_text, answer.cloze);
+        if (card.fullText && card.cloze) {
+            card.printText();
+            flashcardArray.push(card);
+        } 
+    });
+};
 
-function displayCard () {
-
-}
+promptClozeCard();
